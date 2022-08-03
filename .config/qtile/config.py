@@ -34,8 +34,8 @@ home = os.path.expanduser('~')
 mod	= "mod4"
 terminal = guess_terminal()
 browser = "brave"
-explorer = "pcmanfm"
-
+explorer = "thunar"
+emacsclient = "emacsclient -c -a 'emacs'"
 keys = [
 	# A list of available commands	that can be	bound to keys can be found
 	# at https://docs.qtile.org/en/latest/manual/config/lazy.html
@@ -66,12 +66,7 @@ keys = [
 	# Unsplit = 1 window displayed, like Max layout, but still	with
 	# multiple	stack panes
 	Key([mod,	"shift"],"Return",lazy.layout.toggle_split(),desc="Toggle between split and unsplit sides of stack",),
-	
-	#Launch Programs
-	Key([mod],	"Return", lazy.spawn(terminal),	desc="Launch terminal"),
-	Key([mod],	"w", lazy.spawn(browser), desc="Launch Browser"),
-	Key([mod],	"f", lazy.spawn(explorer), desc="Launch File explorer"),
-	
+
 	#Toggle between differentlayouts as defined below
 	Key([mod],	"Tab", lazy.next_layout(), desc="Toggle	between	layouts"),
 	Key([mod],	"q", lazy.window.kill(), desc="Kill	focused	window"),
@@ -79,12 +74,18 @@ keys = [
 	Key([mod, "control"], "q",	lazy.shutdown(), desc="Shutdown	Qtile"),
 	Key([mod],	"r", lazy.spawncmd(), desc="Spawn a	command	using a	prompt widget"),
 
+    #Launch Programs
+	Key([mod],	"e", lazy.spawn(emacsclient),	desc="Launch emacsclient"),
+	Key([mod],	"Return", lazy.spawn(terminal),	desc="Launch terminal"),
+	Key([mod],	"w", lazy.spawn(browser), desc="Launch Browser"),
+	Key([mod],	"f", lazy.spawn(explorer), desc="Launch File explorer"),
+	
   	#MULTIMEDIA KEYS
 	Key([], "XF86AudioMute", lazy.spawn("amixer -D	pulse set Master 1+	toggle"),desc="Mute Audio"),
 	Key([], "XF86AudioLowerVolume", lazy.spawn(
-	"amixer set Master	5%-"),desc="Volume Down"),
+	"amixer set Master	2%-"),desc="Volume Down"),
 	Key([], "XF86AudioRaiseVolume", lazy.spawn(
-	"amixer set Master	5%+"),desc="Volume Up"),
+	"amixer set Master	2%+"),desc="Volume Up"),
 	Key([], "XF86MonBrightnessDown", lazy.spawn(
 								  "light -U 5"),desc="Brightness Down"),
 	Key([], "XF86MonBrightnessUp",	lazy.spawn(
@@ -138,9 +139,9 @@ layouts	= [
 ]
 
 widget_defaults	= dict(
-	font="sans",
-	fontsize=16,
-	padding=5,
+	font="roboto",
+	fontsize=20,
+	padding=10,
 )
 extension_defaults = widget_defaults.copy()
 
@@ -174,8 +175,10 @@ screens	= [
 mouse =	[
 	Drag([mod], "Button1",	lazy.window.set_position_floating(), start=lazy.window.get_position()),
 	Drag([mod], "Button3",	lazy.window.set_size_floating(), start=lazy.window.get_size()),
-	Click([mod], "Button2", lazy.window.bring_to_front()),
-]
+	Click([mod], "Button2",lazy.window.toggle_floating()),
+
+    ]
+
 @hook.subscribe.startup_once
 def	start_once():
 	subprocess.call([home + '/.config/qtile/scripts/autostart.sh'])

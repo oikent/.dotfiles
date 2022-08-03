@@ -1,5 +1,6 @@
+lxsession &
 /usr/bin/lxpolkit &
 variety &
 udiskie &
 picom --config $HOME/.config/qtile/scripts/picom.conf &
-
+/usr/bin/emacs --daemon &
