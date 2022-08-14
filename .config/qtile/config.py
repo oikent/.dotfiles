@@ -26,13 +26,13 @@
 import os
 import subprocess
 from libqtile import bar, layout, widget,hook
-from libqtile.config import	Click, Drag, Group,	Key, Match,	Screen
+from libqtile.config import Click, Drag, Group,	Key, Match,Screen
 from libqtile.lazy import lazy
-from libqtile.utils	import guess_terminal
+from libqtile.utils import guess_terminal
 
-home = os.path.expanduser('~')
+home = os.path.expanduser('~/')
 mod	= "mod4"
-terminal = guess_terminal()
+terminal = "kitty"
 browser = "brave"
 explorer = "thunar"
 emacsclient = "emacsclient -c -a 'emacs'"
@@ -74,25 +74,23 @@ keys = [
 	Key([mod, "control"], "q",	lazy.shutdown(), desc="Shutdown	Qtile"),
 	Key([mod],	"r", lazy.spawncmd(), desc="Spawn a	command	using a	prompt widget"),
 
-    #Launch Programs
+	#Launch Programs
 	Key([mod],	"e", lazy.spawn(emacsclient),	desc="Launch emacsclient"),
 	Key([mod],	"Return", lazy.spawn(terminal),	desc="Launch terminal"),
 	Key([mod],	"w", lazy.spawn(browser), desc="Launch Browser"),
 	Key([mod],	"f", lazy.spawn(explorer), desc="Launch File explorer"),
 	
   	#MULTIMEDIA KEYS
-	Key([], "XF86AudioMute", lazy.spawn("amixer -D	pulse set Master 1+	toggle"),desc="Mute Audio"),
-	Key([], "XF86AudioLowerVolume", lazy.spawn(
-	"amixer set Master	2%-"),desc="Volume Down"),
-	Key([], "XF86AudioRaiseVolume", lazy.spawn(
-	"amixer set Master	2%+"),desc="Volume Up"),
-	Key([], "XF86MonBrightnessDown", lazy.spawn(
-								  "light -U 5"),desc="Brightness Down"),
-	Key([], "XF86MonBrightnessUp",	lazy.spawn(
-									  "light -A 5"),desc="Brightness Up"),
-	#Launch Scripts				  
-	Key([mod],	"c", lazy.spawn('alacritty -e vim .config/qtile/config.py'), desc="Launch config"),
-	Key([mod],	"p", lazy.spawn('.config/qtile/scripts/picom-toggle.sh'), desc="Toggle Picom"),
+	Key([], "XF86AudioMute", lazy.spawn("amixer set Master toggle"),desc="Mute Audio"),
+	Key([],"XF86AudioLowerVolume",lazy.spawn("amixer set Master 5%-"),desc="Volume Down"),
+	Key([],"XF86AudioRaiseVolume", lazy.spawn("amixer set Master 5%+"),desc="Volume Up"),
+	#Key([], "XF86MonBrightnessDown", lazy.spawn( "light -U 20"),desc="Brightness Down"),
+	#Key([], "XF86MonBrightnessUp",	lazy.spawn("light -A 20"),desc="Brightness Up"),
+	Key([], "XF86MonBrightnessDown", lazy.spawn( "brightnessctl -d intel_backlight s 25%-"),desc="Brightness Down"),
+	Key([], "XF86MonBrightnessUp",	lazy.spawn("brightnessctl -d intel_backlight s 25%+"),desc="Brightness Up"),
+	#Launch Scripts
+	Key([mod],"p", lazy.spawn(home + '/.config/qtile/scripts/picom-toggle.sh'), desc="Toggle Picom"),
+	#Key([mod],	"c", lazy.spawn('alacritty -e vim .config/qtile/config.py'), desc="Launch config"),
 ]
 	# Toggle between different	layouts	as defined below
 groups = [Group(i) for i in	"123456789"]
@@ -100,30 +98,20 @@ groups = [Group(i) for i in	"123456789"]
 for	i in groups:
 	keys.extend(
 		[
-			# mod1 +	letter of group	= switch to	group
-			Key(
-				[mod],
-				i.name,
-				lazy.group[i.name].toscreen(),
-				desc="Switch to	group {}".format(i.name),
-			),
+		# mod1 +	letter of group	= switch to	group
+		Key([mod],i.name,lazy.group[i.name].toscreen(),desc="Switch to group {}".format(i.name),),
 			
-			# mod1 +	shift +	letter of group	= switch to	& move focused window to group
-			Key(
-				[mod, "shift"],
-				i.name,
-				lazy.window.togroup(i.name,	switch_group=True),
-				desc="Switch to	& move focused window to group {}".format(i.name),
-			),
-			# Or, use below if you prefer not to	switch to that group.
-			# # mod1	+ shift	+ letter of	group =	move focused window	to group
-			# Key([mod, "shift"], i.name, lazy.window.togroup(i.name),
-			#	 desc="move focused window	to group {}".format(i.name)),
+		# mod1 +	shift +	letter of group	= switch to	& move focused window to group
+		Key([mod, "shift"],i.name,lazy.window.togroup(i.name,switch_group=True),desc="Switch to	& move focused window to group {}".format(i.name),),
+		# Or, use below if you prefer not to	switch to that group.
+		# # mod1	+ shift	+ letter of	group =	move focused window	to group
+		# Key([mod, "shift"], i.name, lazy.window.togroup(i.name),
+		#	 desc="move focused window	to group {}".format(i.name)),
 		]
 	)
 
 layouts	= [
-	layout.Columns(border_focus_stack=["#d75f5f", "#8f3d3d"], border_width=4),
+	layout.Columns(border_focus_stack=["#d75f5f", "#8f3d3d"], border_width=4,margin=10),
 	layout.Max(),
 	# Try more	layouts	by unleashing below	layouts.
 	# layout.Stack(num_stacks=2),
@@ -137,11 +125,24 @@ layouts	= [
 	# layout.VerticalTile(),
 	# layout.Zoomy(),
 ]
+doom_one = {
+	'black':'#282C34',
+	'white':'#EEEEEE',
+	'skyblue':'#51AFED',
+	'pink':'#DCAEEA',
+	'lightgreen':'#98BE65',
+	'grey':'#BBC2CB',
+	'green':'#4A6F58',
+	'orange':'#ECBD79',
+	'blue':'#282D54'
+}
+
 
 widget_defaults	= dict(
-	font="roboto",
-	fontsize=20,
+	font="FiraCode Nerd Font",
+	fontsize=18,
 	padding=10,
+	background=doom_one['black'],
 )
 extension_defaults = widget_defaults.copy()
 
@@ -160,11 +161,17 @@ screens	= [
 					name_transform=lambda name: name.upper(),
 				),
 				widget.Systray(),
+				widget.CheckUpdates(),
+				widget.TextBox(''),
+				widget.Bluetooth(hci="/dev_23_91_6A_BC_BE_97"),
+				widget.TextBox(''),
+				widget.Backlight(backlight_name="intel_backlight"),
+				widget.TextBox(''),
+				widget.Volume(),
 				widget.Clock(format="%I:%M %p %a %d-%m-%Y "),
-				widget.QuickExit(),
-				widget.Battery()
+				widget.Battery(foreground=doom_one['skyblue'])
 			],
-			30,
+			40,
 			# border_width=[2, 0, 2,	0],	 # Draw	top	and	bottom borders
 			# border_color=["ff00ff", "000000", "ff00ff", "000000"]	# Borders are magenta
 		),
@@ -181,7 +188,7 @@ mouse =	[
 
 @hook.subscribe.startup_once
 def	start_once():
-	subprocess.call([home + '/.config/qtile/scripts/autostart.sh'])
+	subprocess.call([home + '.config/qtile/scripts/autostart.sh'])
 
 
 dgroups_key_binder = None

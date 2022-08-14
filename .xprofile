@@ -2,5 +2,6 @@ lxsession &
 /usr/bin/lxpolkit &
 variety &
 udiskie &
-picom --config $HOME/.config/qtile/scripts/picom.conf &
+#picom --config $HOME/.config/qtile/scripts/picom.conf &
+picom --experimental-backend --config $HOME/.config/qtile/scripts/picom.conf &
 /usr/bin/emacs --daemon &
